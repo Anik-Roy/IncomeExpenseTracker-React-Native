@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import { TextInput, Button, RadioButton } from 'react-native-paper';
 import { addTransaction } from '../../redux/transactionActionCreators';
 import { connect } from 'react-redux';
@@ -13,7 +13,7 @@ const mapDispatchToProps = dispatch => {
 }
 
 const Add = props => {
-    // console.log(props);
+    console.log(props);
     const [ checked, setChecked ] = useState("first");
     const [ title, setTitle ] = useState("");
     const [ amount, setAmount ] = useState("");
@@ -63,7 +63,7 @@ const Add = props => {
     }
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <View style={styles.radioContainer}>
                 <View>
                     <Text>Income</Text>
@@ -119,7 +119,7 @@ const Add = props => {
                     }
                 }}/>
             <Button style={{marginTop: 10}} mode="contained" onPress={() => addTheItem()}>Add Item</Button>
-        </View>
+        </SafeAreaView>
     )
 }
 

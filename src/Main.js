@@ -82,7 +82,8 @@ const DashboardStack = () => {
                         headerLeft: () => (
                             <Icon action={()=>navigation.toggleDrawer()} name="ios-menu" color="black" size={28} iconStyle={{paddingLeft: 15}} />
                         ),
-                        headerTitle: getHeaderTitle(route),
+                        title: "Accounts",
+                        // headerTitle: getHeaderTitle(route),
                         headerRight: () => (
                             <TouchableOpacity onPress={() => {
                                 store.dispatch(tryLogout());
@@ -115,9 +116,9 @@ const DashboardStack = () => {
                     component={Add}
                     options={{
                         title: "Add a transaction",
-                        headerRight: () => (
-                            <Icon action={()=>navigation.toggleDrawer()} name="ios-menu" color="black" size={28} iconStyle={{paddingRight: 15}} />
-                        ),
+                        // headerRight: () => (
+                        //     <Icon action={()=>navigation.toggleDrawer()} name="ios-menu" color="black" size={28} iconStyle={{paddingRight: 15}} />
+                        // ),
                     }}/>
         </Stack.Navigator>
     )
@@ -183,9 +184,9 @@ const Main = props => {
                             <Drawer.Screen
                                 name="Dashboard"
                                 component={DashboardStack} />
-                            <Drawer.Screen
+                            {/* <Drawer.Screen
                                 name="AddCategory"
-                                component={AddCategoryStack} />
+                                component={AddCategoryStack} /> */}
                     </Drawer.Navigator>
                 </NavigationContainer>
             );

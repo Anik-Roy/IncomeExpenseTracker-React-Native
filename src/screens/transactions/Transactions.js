@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, SectionList, StyleSheet } from 'react-native';
+import { View, Image, SectionList, StyleSheet } from 'react-native';
 import {Title, TextInput, Button, RadioButton, Paragraph, Dialog, Modal, Portal, Text, Provider, FAB} from 'react-native-paper';
 import { connect, useSelector } from 'react-redux';
 import Top from './Top';
 import Expense from './Expense';
+import { rangeFilter } from './RangeFilter';
 import { fetchTransaction, updateTransaction, deleteTransaction } from '../../redux/transactionActionCreators';
 import moment from 'moment';
 import format from 'date-fns/format';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const mapStateToProps = state => {
     return {
@@ -30,20 +32,60 @@ const Transactions = props => {
     const [visible, setVisible] = useState(false);
     const [itemToBeDeleted, setItemToBeDeleted] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const [filterModalVisible, setFilterModalVisible] = useState(false);
     const [ selectedItem, setSelectedItem ] = useState(null);
     const [ checked, setChecked ] = useState("first");
     const [ title, setTitle ] = useState("");
     const [ amount, setAmount ] = useState("");
+    const [filteredTransactions, setFilteredTransactions] = useState([]);
     const [DATA, setDATA] = useState([]);
     const [date, setDate] = useState(new Date());
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
+    const [startClicked, setStartClicked] = useState(false);
+    const [endClicked, setEndClicked] = useState(false);
+    const [mode, setMode] = useState('date');
+    const [show, setShow] = useState(false);
+
     const {item} = props.route.params;
     console.log("account name > ", item.account, "account id > ", item.id);
     const showModal = () => setModalVisible(true);
     const hideModal = () => setModalVisible(false);
-
+    const hideFilterModal = () => setFilterModalVisible(false);
+    
     useEffect(() => {
         props.fetchTransaction(item.id);
     }, []);
+
+    const showMode = (currentMode) => {
+        setShow(true);
+        setMode(currentMode);
+    };
+
+    const showDatepicker = () => {
+        showMode('date');
+    };
+
+    const onStartDateChange = (event, selectedDate) => {
+        const currentDate = selectedDate || startDate;
+        setShow(Platform.OS === 'ios');
+        setStartDate(currentDate);
+        console.log("current date > ", currentDate.toLocaleTimeString());
+    };
+
+    const onEndDateChange = (event, selectedDate) => {
+        const currentDate = selectedDate || endDate;
+        setShow(Platform.OS === 'ios');
+        setEndDate(currentDate);
+        console.log("end date > ", currentDate.toLocaleTimeString());
+    };
+
+    const clearFilter = () => {
+        setStartDate(null);
+        setEndDate(null);
+        setStartClicked(false);
+        setEndClicked(false);
+    }
 
     // let DATA = Object.values(
     //     props.transactions.reduce((acc, item) => {
@@ -59,36 +101,108 @@ const Transactions = props => {
     //     }, {}));
 
     useEffect(() => {
-        let selectedMonth = date.getMonth();
-        let selectedYear = date.getUTCFullYear();
-        
-        let filtered_transactions = props.transactions.filter(item => {
-            const entryDate = new Date(item.date);
-            let entryMonth = entryDate.getMonth();
-            let entryYear = entryDate.getUTCFullYear();
+        if(startDate === null || endDate === null) {
+            let selectedMonth = date.getMonth();
+            let selectedYear = date.getUTCFullYear();
             
-            if(selectedMonth === entryMonth && selectedYear === entryYear) {
-                return true;
-            }
-            return false;
-        });
-
-        // console.log("filtered transactions > ", filtered_transactions);
-
-        setDATA(Object.values(
-            filtered_transactions.reduce((acc, item) => {
-                if (!acc[item.addedtime]) {
-                    acc[item.addedtime] = {
-                        title: item.addedtime,
-                        data: [],
-                        price: item.price,
-                    };
+            let filtered_transactions = props.transactions.filter(item => {
+                const entryDate = new Date(item.date);
+                let entryMonth = entryDate.getMonth();
+                let entryYear = entryDate.getUTCFullYear();
+                
+                if(selectedMonth === entryMonth && selectedYear === entryYear) {
+                    return true;
                 }
-                acc[item.addedtime].data.push(item);
-                return acc;
-            }, {})
-        ));
-    }, [props.transactions, date]);
+                return false;
+            });
+
+            setFilteredTransactions(filtered_transactions);
+
+            setDATA(Object.values(
+                filtered_transactions.reduce((acc, item) => {
+                    if (!acc[item.addedtime]) {
+                        acc[item.addedtime] = {
+                            title: item.addedtime,
+                            data: [],
+                            price: item.price,
+                        };
+                    }
+                    acc[item.addedtime].data.push(item);
+                    return acc;
+                }, {})
+            ));
+            return;
+        } else {
+
+            let sDate = new Date(startDate);
+            let eDate = new Date(endDate);
+
+            if(sDate > eDate) {
+                alert('Invalid date range!');
+            } else {
+                let filtered_transactions = props.transactions.filter(item => {
+                    const entryDate = new Date(item.date);
+                    console.log(sDate, eDate, entryDate);
+                    if(rangeFilter(sDate, eDate, entryDate)) {
+                        console.log('range filter true > ', sDate, eDate, entryDate);
+                        return true;
+                    }
+                    console.log('range filter false > ', sDate, eDate, entryDate);
+                    return false;
+                });
+        
+                setFilteredTransactions(filtered_transactions);
+
+                setDATA(Object.values(
+                    filtered_transactions.reduce((acc, item) => {
+                        if (!acc[item.date]) {
+                            acc[item.date] = {
+                                title: item.date,
+                                data: [],
+                                price: item.price,
+                            };
+                        }
+                        acc[item.date].data.push(item);
+                        return acc;
+                    }, {})
+                ));
+            }
+        }
+    }, [props.transactions, date, startDate, endDate]);
+
+    // useEffect(() => {
+    //     let selectedMonth = date.getMonth();
+    //     let selectedYear = date.getUTCFullYear();
+        
+    //     let filtered_transactions = props.transactions.filter(item => {
+    //         const entryDate = new Date(item.date);
+    //         let entryMonth = entryDate.getMonth();
+    //         let entryYear = entryDate.getUTCFullYear();
+            
+    //         if(selectedMonth === entryMonth && selectedYear === entryYear) {
+    //             return true;
+    //         }
+    //         return false;
+    //     });
+
+    //     // console.log("filtered transactions > ", filtered_transactions);
+
+    //     setFilteredTransactions(filtered_transactions);
+
+    //     setDATA(Object.values(
+    //         filtered_transactions.reduce((acc, item) => {
+    //             if (!acc[item.addedtime]) {
+    //                 acc[item.addedtime] = {
+    //                     title: item.addedtime,
+    //                     data: [],
+    //                     price: item.price,
+    //                 };
+    //             }
+    //             acc[item.addedtime].data.push(item);
+    //             return acc;
+    //         }, {})
+    //     ));
+    // }, [props.transactions, date]);
 
     const updateTheItem = () => {
         let inputAmount = parseFloat(amount);
@@ -136,7 +250,7 @@ const Transactions = props => {
 
     return (
         <View style={styles.container}>
-            <Top account={item} date={date} onChange={date => setDate(date)} />
+            <Top account={item} date={date} startDate={startDate} endDate={endDate} clearFilter={clearFilter} filteredTransactions={filteredTransactions} setFilterModalVisible={() => setFilterModalVisible(true)} onChange={date => setDate(date)} />
             <SectionList
                 sections={DATA}
                 renderItem={({item}) => {
@@ -151,7 +265,7 @@ const Transactions = props => {
                                 item={item}
                                 deleteItem={() => deleteItem(item)} />
                 }}
-                renderSectionHeader={({section}) => <Title style={styles.sectionHeader}>{moment(section.title, 'x').format('MM-DD-YYYY')}</Title>}
+                renderSectionHeader={({section}) => <Title style={styles.sectionHeader}>{new Date(section.title).toDateString()}</Title>}
                 keyExtractor={(item, index) => index} />
             <FAB small onPress={() => props.navigation.navigate("Add", {account: item})}  icon="plus" style={styles.fab} />
             <Portal>
@@ -230,6 +344,40 @@ const Transactions = props => {
                     </View>
                 </Modal>
             </Portal>
+            <Portal>
+                <Modal visible={filterModalVisible} onDismiss={hideFilterModal} contentContainerStyle={styles.modalStyle}>
+                    <Title style={{marginBottom: 20}}>Filter transaction</Title>
+                    <View style={styles.modalContainer}>
+                        <View style={styles.filterButtonContainer}>                            
+                            <View>
+                                <Button onPress={() => {setEndClicked(false); setStartClicked(true); showDatepicker()}} mode="outlined" dark>Start date</Button>
+                                <Text>{startDate && format(new Date(startDate), 'dd MMMM yy')}</Text>
+                            </View>
+                            <View>
+                                <Button  onPress={() => {setStartClicked(false); setEndClicked(true); showDatepicker()}} mode="outlined" dark>End date</Button>
+                                <Text>{endDate && format(new Date(endDate), 'dd MMMM yy')}</Text>
+                            </View>
+                        </View>
+                        {show && (
+                            <DateTimePicker
+                                testID="dateTimePicker"
+                                value={date}
+                                mode={mode}
+                                is24Hour={true}
+                                display="default"
+                                onChange={startClicked ? onStartDateChange : onEndDateChange}
+                            />
+                        )}
+                        <Button style={{marginTop: 10}} mode="outlined" onPress={() => {
+                            if(startDate === null || endDate === null) {
+                                alert('Please select valid date range!');
+                            } else {
+                                hideFilterModal();
+                            }
+                        }}>Done</Button>
+                    </View>
+                </Modal>
+            </Portal>
         </View>
     )
 }
@@ -256,6 +404,7 @@ const styles = StyleSheet.create({
     },
     modalStyle: {
         display: "flex",
+        // height: "40%",
         flexDirection: "column",
         backgroundColor: 'white',
         padding: 20,
@@ -274,7 +423,8 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: "flex-start"
+        justifyContent: "space-between",
+        // backgroundColor: "green"
     },
     radioContainer: {
         width: "100%",
@@ -282,6 +432,13 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-evenly",
         marginVertical: 20
+    },
+    filterButtonContainer: {
+        display: 'flex',
+        flexDirection: "row",
+        justifyContent: "space-around",
+        width: "100%",
+        marginBottom: 20
     }
 });
 export default connect(mapStateToProps, mapDispatchToProps)(Transactions);

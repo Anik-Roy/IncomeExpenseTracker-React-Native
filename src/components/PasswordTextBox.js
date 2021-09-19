@@ -8,7 +8,7 @@ const PasswordTextBox = props => {
     const iconName = visible ? "eye-outline" : "eye-off-outline"
 
     return (
-        <View style={{...props.style, flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+        <View style={{...props.style, flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 5, marginVertical: 10, backgroundColor: "#eee", borderWidth: 1, borderColor: "#009688", borderRadius: 4}}>
             <TextInput
                 placeholder={props.placeholderValue}
                 value={props.value}

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import {View, Text, StyleSheet} from 'react-native'
-import { Chart } from "../Svgs";
-import { Avatar, Button, Divider, Card, Title, Paragraph } from 'react-native-paper';
+import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
+import { Avatar, Button, Divider, Card, Title, Paragraph, Modal, Portal, Provider } from 'react-native-paper';
 import { connect, useSelector, useDispatch } from "react-redux";
-import { AntDesign } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import MonthYearPicker from '../../components/MonthYearPicker';
+import filtericon from '../../images/filter.png';
 
 const mapStateToProps = state => {
     return {
@@ -23,7 +23,7 @@ const Top = props => {
     let selectedMonth = props.date.getMonth();
     let selectedYear = props.date.getUTCFullYear();
 
-    const filtered_transactions = props.transactions.filter(item => {
+    const filtered_transactions = props.filteredTransactions.filter(item => {
         const entryDate = new Date(item.date);
         let entryMonth = entryDate.getMonth();
         let entryYear = entryDate.getUTCFullYear();
@@ -49,6 +49,14 @@ const Top = props => {
        <Card>
             <Title style={styles.cardTitle}>Account name: {props.account.account}</Title>
             {/* <Card.Title style={styles.cardTitle} title={props.authUserInfo.email} subtitle={props.account.account} left={LeftContent} /> */}
+            <View style={{display: 'flex', flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginLeft: 10, marginBottom: 10}}>
+                {(props.startDate === null || props.endDate === null) && <TouchableOpacity onPress={props.setFilterModalVisible}>
+                    <Image style={styles.filtericonStyle} source={filtericon} />
+                </TouchableOpacity>}
+                {(props.startDate !== null && props.endDate !== null) && <TouchableOpacity onPress={props.clearFilter}>
+                    <Button sm mode="outlined">Clear filter</Button>
+                </TouchableOpacity>}
+            </View>
             <View>
                 <MonthYearPicker style={{paddingLeft: 0, paddingRight: 0}} date={props.date} onChange={props.onChange} />
             </View>
@@ -87,7 +95,19 @@ const styles = StyleSheet.create({
     dividerStyle: {
         width: 5,
         height: "100%"
-    }
+    },
+    filtericonStyle: {
+        width: 30,
+        height: 30,
+        marginHorizontal: 20,
+        marginVertical: 10
+    },
+    clearFilterStyle: {
+        width: 30,
+        height: 30,
+        marginHorizontal: 20,
+        marginVertical: 10
+    } 
 })
 
 export default connect(mapStateToProps)(Top);
