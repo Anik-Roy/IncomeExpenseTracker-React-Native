@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableWithoutFeedback } from "react-native";
 import Icon from "../../components/Icon";
 
 const Account = props => {
-    // console.log(props);
     return (
         <View style={styles.root}>
             <View style={styles.container}>
@@ -22,8 +21,7 @@ const Account = props => {
 }
 const styles = StyleSheet.create({
     root: {
-        flex: 1,
-        // backgroundColor: "red"
+        flex: 1
     },
     container: {
         display: "flex",

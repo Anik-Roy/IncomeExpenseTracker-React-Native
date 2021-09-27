@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Image, SectionList, StyleSheet } from 'react-native';
-import {Title, TextInput, Button, RadioButton, Paragraph, Dialog, Modal, Portal, Text, Provider, FAB} from 'react-native-paper';
+import { View, SectionList, StyleSheet } from 'react-native';
+import { Title, TextInput, Button, RadioButton, Paragraph, Dialog, Modal, Portal, Text, Provider, FAB } from 'react-native-paper';
 import { connect, useSelector } from 'react-redux';
 import Top from './Top';
 import Expense from './Expense';
@@ -27,16 +27,16 @@ const mapDispatchToProps = dispatch => {
 
 const Transactions = props => {
     // console.log("----------------------------------------------------");
-    // console.log("-------------Transactions.js > ", props.transactions);
+    console.log("-------------Transactions.js > ", props);
     // console.log("----------------------------------------------------");
     const [visible, setVisible] = useState(false);
     const [itemToBeDeleted, setItemToBeDeleted] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const [filterModalVisible, setFilterModalVisible] = useState(false);
-    const [ selectedItem, setSelectedItem ] = useState(null);
-    const [ checked, setChecked ] = useState("first");
-    const [ title, setTitle ] = useState("");
-    const [ amount, setAmount ] = useState("");
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [checked, setChecked] = useState("first");
+    const [title, setTitle] = useState("");
+    const [amount, setAmount] = useState("");
     const [filteredTransactions, setFilteredTransactions] = useState([]);
     const [DATA, setDATA] = useState([]);
     const [date, setDate] = useState(new Date());
@@ -47,12 +47,12 @@ const Transactions = props => {
     const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
 
-    const {item} = props.route.params;
+    const { item } = props.route.params;
     console.log("account name > ", item.account, "account id > ", item.id);
     const showModal = () => setModalVisible(true);
     const hideModal = () => setModalVisible(false);
     const hideFilterModal = () => setFilterModalVisible(false);
-    
+
     useEffect(() => {
         props.fetchTransaction(item.id);
     }, []);
@@ -101,16 +101,16 @@ const Transactions = props => {
     //     }, {}));
 
     useEffect(() => {
-        if(startDate === null || endDate === null) {
+        if (startDate === null || endDate === null) {
             let selectedMonth = date.getMonth();
             let selectedYear = date.getUTCFullYear();
-            
+
             let filtered_transactions = props.transactions.filter(item => {
                 const entryDate = new Date(item.date);
                 let entryMonth = entryDate.getMonth();
                 let entryYear = entryDate.getUTCFullYear();
-                
-                if(selectedMonth === entryMonth && selectedYear === entryYear) {
+
+                if (selectedMonth === entryMonth && selectedYear === entryYear) {
                     return true;
                 }
                 return false;
@@ -137,20 +137,20 @@ const Transactions = props => {
             let sDate = new Date(startDate);
             let eDate = new Date(endDate);
 
-            if(sDate > eDate) {
+            if (sDate > eDate) {
                 alert('Invalid date range!');
             } else {
                 let filtered_transactions = props.transactions.filter(item => {
                     const entryDate = new Date(item.date);
                     console.log(sDate, eDate, entryDate);
-                    if(rangeFilter(sDate, eDate, entryDate)) {
+                    if (rangeFilter(sDate, eDate, entryDate)) {
                         console.log('range filter true > ', sDate, eDate, entryDate);
                         return true;
                     }
                     console.log('range filter false > ', sDate, eDate, entryDate);
                     return false;
                 });
-        
+
                 setFilteredTransactions(filtered_transactions);
 
                 setDATA(Object.values(
@@ -173,12 +173,12 @@ const Transactions = props => {
     // useEffect(() => {
     //     let selectedMonth = date.getMonth();
     //     let selectedYear = date.getUTCFullYear();
-        
+
     //     let filtered_transactions = props.transactions.filter(item => {
     //         const entryDate = new Date(item.date);
     //         let entryMonth = entryDate.getMonth();
     //         let entryYear = entryDate.getUTCFullYear();
-            
+
     //         if(selectedMonth === entryMonth && selectedYear === entryYear) {
     //             return true;
     //         }
@@ -206,13 +206,13 @@ const Transactions = props => {
 
     const updateTheItem = () => {
         let inputAmount = parseFloat(amount);
-        if(title === "") {
+        if (title === "") {
             alert("Please enter a title!")
-        } else if(isNaN(inputAmount) || inputAmount === 0) {
+        } else if (isNaN(inputAmount) || inputAmount === 0) {
             alert("Please enter a valid amount!");
         } else {
             // { addedtime: 1576590342000, id: 2, title: "Amala Soup", price: -40 },
-            if(checked === 'second') {
+            if (checked === 'second') {
                 inputAmount = amount * -1;
             }
             props.updateTransaction({
@@ -235,15 +235,15 @@ const Transactions = props => {
 
     const deleteItemConfirmed = async () => {
         try {
-            console.log("itemToBeDeleted > ",itemToBeDeleted);
-            if(itemToBeDeleted === null) {
+            console.log("itemToBeDeleted > ", itemToBeDeleted);
+            if (itemToBeDeleted === null) {
                 alert("No item selected!");
                 console.log(props);
             } else {
                 props.deleteTransaction(itemToBeDeleted);
             }
             return true;
-        } catch(error) {
+        } catch (error) {
             return false;
         }
     }
@@ -253,24 +253,24 @@ const Transactions = props => {
             <Top account={item} date={date} startDate={startDate} endDate={endDate} clearFilter={clearFilter} filteredTransactions={filteredTransactions} setFilterModalVisible={() => setFilterModalVisible(true)} onChange={date => setDate(date)} />
             <SectionList
                 sections={DATA}
-                renderItem={({item}) => {
+                renderItem={({ item }) => {
                     const index = item.id;
                     return <Expense
-                                onTap={() => {
-                                    setModalVisible(true);
-                                    setSelectedItem(item);
-                                    setTitle(item.title);
-                                    setAmount(item.price.toString());
-                                }}
-                                item={item}
-                                deleteItem={() => deleteItem(item)} />
+                        onTap={() => {
+                            setModalVisible(true);
+                            setSelectedItem(item);
+                            setTitle(item.title);
+                            setAmount(item.price.toString());
+                        }}
+                        item={item}
+                        deleteItem={() => deleteItem(item)} />
                 }}
-                renderSectionHeader={({section}) => <Title style={styles.sectionHeader}>{new Date(section.title).toDateString()}</Title>}
+                renderSectionHeader={({ section }) => <Title style={styles.sectionHeader}>{new Date(section.title).toDateString()}</Title>}
                 keyExtractor={(item, index) => index} />
-            <FAB small onPress={() => props.navigation.navigate("Add", {account: item})}  icon="plus" style={styles.fab} />
+            <FAB small onPress={() => props.navigation.navigate("Add", { account: item })} icon="plus" style={styles.fab} />
             <Portal>
-                <Dialog visible={visible} onDismiss={()=>setVisible(false)}>
-                <Dialog.Title>Warning</Dialog.Title>
+                <Dialog visible={visible} onDismiss={() => setVisible(false)}>
+                    <Dialog.Title>Warning</Dialog.Title>
                     <Dialog.Content>
                         <Paragraph>Are you sure to delete this transaction record?</Paragraph>
                     </Dialog.Content>
@@ -281,17 +281,17 @@ const Transactions = props => {
                         }}>Cancel</Button>
                         <Button onPress={() => {
                             deleteItemConfirmed()
-                            .then(response => {
-                                if(response) {
-                                    console.log("successfull!");
-                                    setVisible(false);
-                                } else {
-                                    console.log("unsuccessfull!");
-                                    setVisible(false);
-                                    alert("An error occured!");
-                                }
-                            });
-                            
+                                .then(response => {
+                                    if (response) {
+                                        console.log("successfull!");
+                                        setVisible(false);
+                                    } else {
+                                        console.log("unsuccessfull!");
+                                        setVisible(false);
+                                        alert("An error occured!");
+                                    }
+                                });
+
                         }}>Ok</Button>
                     </Dialog.Actions>
                 </Dialog>
@@ -309,52 +309,52 @@ const Transactions = props => {
                                     status={checked === "first" ? 'checked' : 'unchecked'}
                                     onPress={() => setChecked('first')} />
                             </View>
-                            
+
                             <View>
                                 <Text>Expense</Text>
                                 <RadioButton
                                     color="red"
                                     value="Expense"
                                     status={checked === "second" ? "checked" : "unchecked"}
-                                    onPress={()=>setChecked('second')}/>
+                                    onPress={() => setChecked('second')} />
                             </View>
                         </View>
 
                         <TextInput
-                            style={{width: "85%", marginVertical: 20}}
+                            style={{ width: "85%", marginVertical: 20 }}
                             mode="outlined"
                             label="Enter Type of transaction"
                             value={title}
                             onChangeText={value => setTitle(value)} />
 
                         <TextInput
-                            style={{width: "85%", marginVertical: 20}}
+                            style={{ width: "85%", marginVertical: 20 }}
                             mode="outlined"
                             keyboardType="numeric"
                             label="Enter amount"
                             value={amount}
                             onChangeText={value => {
-                                if(!isNaN(value)) {
+                                if (!isNaN(value)) {
                                     setAmount(value);
                                 } else {
                                     alert("Please enter a number!");
                                 }
-                            }}/>
-                        <Button style={{marginTop: 10}} mode="contained" onPress={() => updateTheItem()}>Update Item</Button>
+                            }} />
+                        <Button style={{ marginTop: 10 }} mode="contained" onPress={() => updateTheItem()}>Update Item</Button>
                     </View>
                 </Modal>
             </Portal>
             <Portal>
                 <Modal visible={filterModalVisible} onDismiss={hideFilterModal} contentContainerStyle={styles.modalStyle}>
-                    <Title style={{marginBottom: 20}}>Filter transaction</Title>
+                    <Title style={{ marginBottom: 20 }}>Filter transaction</Title>
                     <View style={styles.modalContainer}>
-                        <View style={styles.filterButtonContainer}>                            
+                        <View style={styles.filterButtonContainer}>
                             <View>
-                                <Button onPress={() => {setEndClicked(false); setStartClicked(true); showDatepicker()}} mode="outlined" dark>Start date</Button>
+                                <Button onPress={() => { setEndClicked(false); setStartClicked(true); showDatepicker() }} mode="outlined" dark>Start date</Button>
                                 <Text>{startDate && format(new Date(startDate), 'dd MMMM yy')}</Text>
                             </View>
                             <View>
-                                <Button  onPress={() => {setStartClicked(false); setEndClicked(true); showDatepicker()}} mode="outlined" dark>End date</Button>
+                                <Button onPress={() => { setStartClicked(false); setEndClicked(true); showDatepicker() }} mode="outlined" dark>End date</Button>
                                 <Text>{endDate && format(new Date(endDate), 'dd MMMM yy')}</Text>
                             </View>
                         </View>
@@ -368,8 +368,8 @@ const Transactions = props => {
                                 onChange={startClicked ? onStartDateChange : onEndDateChange}
                             />
                         )}
-                        <Button style={{marginTop: 10}} mode="outlined" onPress={() => {
-                            if(startDate === null || endDate === null) {
+                        <Button style={{ marginTop: 10 }} mode="outlined" onPress={() => {
+                            if (startDate === null || endDate === null) {
                                 alert('Please select valid date range!');
                             } else {
                                 hideFilterModal();
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
         flexDirection: "column",
         backgroundColor: 'white',
         padding: 20,
-        alignItems:"center"
+        alignItems: "center"
     },
     fab: {
         position: 'absolute',

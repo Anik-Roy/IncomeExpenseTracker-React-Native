@@ -14,7 +14,7 @@ export const addAccount = data => dispatch => {
         addedtime: new Date()
       }).then(response => {
         if(response.status === 200) {
-          console.log("account id > ",response.data.name);
+        //   console.log("account id > ",response.data.name);
           dispatch({
               type: actionTypes.ADD_ACCOUNT,
               payload: {
@@ -98,7 +98,7 @@ export const fetchAccounts = () => (dispatch, getState) => {
           for(let key in data) {
             accounts.push({...data[key], id: key});
           }
-          console.log("accounts > ", accounts);
+        //   console.log("accounts > ", accounts);
           dispatch({
             type: actionTypes.FETCH_ACCOUNTS,
             payload: accounts

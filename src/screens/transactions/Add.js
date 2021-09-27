@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import { TextInput, Button, RadioButton } from 'react-native-paper';
 import { addTransaction } from '../../redux/transactionActionCreators';
 import { connect } from 'react-redux';
-import { useState } from 'react/cjs/react.development';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 const mapDispatchToProps = dispatch => {
@@ -13,7 +12,7 @@ const mapDispatchToProps = dispatch => {
 }
 
 const Add = props => {
-    console.log(props);
+    console.log("Add > ", props);
     const [ checked, setChecked ] = useState("first");
     const [ title, setTitle ] = useState("");
     const [ amount, setAmount ] = useState("");
